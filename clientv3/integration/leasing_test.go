@@ -619,7 +619,9 @@ func TestLeasingTxnOwnerGet(t *testing.T) {
 	clus := integration.NewClusterV3(t, &integration.ClusterConfig{Size: 1})
 	defer clus.Terminate(t)
 
-	lkv, closeLKV, err := leasing.NewKV(clus.Client(0), "pfx/")
+	client := clus.Client(0);
+
+	lkv, closeLKV, err := leasing.NewKV(client, "pfx/")
 	testutil.AssertNil(t, err)
 	defer closeLKV()
 
@@ -628,27 +630,28 @@ func TestLeasingTxnOwnerGet(t *testing.T) {
 	presps := make([]*clientv3.PutResponse, keyCount)
 	for i := range presps {
 		k := fmt.Sprintf("k-%d", i)
-		presp, err := clus.Client(0).Put(context.TODO(), k, k+k)
+		presp, err := clus.Client(0).Put(client.Ctx(), k, k+k)
 		if err != nil {
 			t.Fatal(err)
 		}
 		presps[i] = presp
 
-		if _, err = lkv.Get(context.TODO(), k); err != nil {
+		if _, err = lkv.Get(client.Ctx(), k); err != nil {
 			t.Fatal(err)
 		}
 		ops = append(ops, clientv3.OpGet(k))
 	}
+	// TODO: Avoid intentional indeterminism in unit test.
 	ops = ops[:rand.Intn(len(ops))]
 
 	// served through cache
 	clus.Members[0].Stop(t)
 
 	var thenOps, elseOps []clientv3.Op
+	// TODO: Avoid intentional indeterminism in unit test.
 	cmps, useThen := randCmps("k-", presps)
 
 	if useThen {
-
 		thenOps = ops
 		elseOps = []clientv3.Op{clientv3.OpPut("k", "1")}
 	} else {
@@ -656,7 +659,7 @@ func TestLeasingTxnOwnerGet(t *testing.T) {
 		elseOps = ops
 	}
 
-	tresp, terr := lkv.Txn(context.TODO()).
+	tresp, terr := lkv.Txn(client.Ctx()).
 		If(cmps...).
 		Then(thenOps...).
 		Else(elseOps...).Commit()

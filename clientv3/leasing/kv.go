@@ -16,6 +16,7 @@ package leasing
 
 import (
 	"context"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -68,18 +69,23 @@ func NewKV(cl *v3.Client, pfx string, opts ...concurrency.SessionOption) (v3.KV,
 	lkv.wg.Add(2)
 	go func() {
 		defer lkv.wg.Done()
+		log.Printf("lkv.monitorSession()")
 		lkv.monitorSession()
 	}()
 	go func() {
 		defer lkv.wg.Done()
+		log.Printf("lkv.leases.clearOldRevokes(cctx)")
 		lkv.leases.clearOldRevokes(cctx)
 	}()
 	return lkv, lkv.Close, lkv.waitSession(cctx)
 }
 
 func (lkv *leasingKV) Close() {
+	log.Printf("Cancelling")
 	lkv.cancel()
+	log.Printf("Cancelled")
 	lkv.wg.Wait()
+	log.Printf("Waited")
 }
 
 func (lkv *leasingKV) Get(ctx context.Context, key string, opts ...v3.OpOption) (*v3.GetResponse, error) {
@@ -166,6 +172,7 @@ func (lkv *leasingKV) monitorLease(ctx context.Context, key string, rev int64) {
 				return
 			}
 		}
+		log.Printf("Watching key: %s from rev: %d", lkv.pfx+key, rev+1)
 		wch := lkv.cl.Watch(cctx, lkv.pfx+key, v3.WithRev(rev+1))
 		for resp := range wch {
 			for _, ev := range resp.Events {
@@ -324,8 +331,10 @@ func (lkv *leasingKV) get(ctx context.Context, op v3.Op) (*v3.GetResponse, error
 		getResp = lkv.leases.Add(key, getResp, op)
 		lkv.wg.Add(1)
 		go func() {
+			log.Printf("lkv.monitorLease")
 			defer lkv.wg.Done()
 			lkv.monitorLease(ctx, key, resp.Header.Revision)
+			log.Printf("lkv.monitorLease [DONE]")
 		}()
 	}
 	return getResp, nil

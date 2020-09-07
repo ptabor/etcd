@@ -18,8 +18,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"sync"
 	"time"
+	"unsafe"
 
 	v3rpc "go.etcd.io/etcd/v3/etcdserver/api/v3rpc/rpctypes"
 	pb "go.etcd.io/etcd/v3/etcdserver/etcdserverpb"
@@ -925,6 +927,7 @@ func (w *watchGrpcStream) waitCancelSubstreams(stopc <-chan struct{}) <-chan str
 				}
 				return
 			}
+			log.Printf("Will wait for context: %v %d", ws.initReq.ctx, unsafe.Pointer(&ws.initReq.ctx))
 			select {
 			case <-ws.initReq.ctx.Done():
 				// closed ws will be removed from resuming
