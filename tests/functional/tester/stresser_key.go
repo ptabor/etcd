@@ -23,10 +23,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"go.etcd.io/etcd/tests/v3/functional/rpcpb"
 	"go.etcd.io/etcd/v3/clientv3"
 	"go.etcd.io/etcd/v3/etcdserver"
 	"go.etcd.io/etcd/v3/etcdserver/api/v3rpc/rpctypes"
-	"go.etcd.io/etcd/v3/functional/rpcpb"
 	"go.etcd.io/etcd/v3/raft"
 
 	"go.uber.org/zap"
