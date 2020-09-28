@@ -24,6 +24,7 @@ import (
 	pb "go.etcd.io/etcd/v3/etcdserver/etcdserverpb"
 	"go.etcd.io/etcd/tests/v3/integration"
 	"go.etcd.io/etcd/v3/pkg/testutil"
+	"go.etcd.io/etcd/v3/proxy/grpcproxy"
 
 	"google.golang.org/grpc"
 )
@@ -76,7 +77,7 @@ func newKVProxyServer(endpoints []string, t *testing.T) *kvproxyTestServer {
 		t.Fatal(err)
 	}
 
-	kvp, _ := NewKvProxy(client)
+	kvp, _ := grpcproxy.NewKvProxy(client)
 
 	kvts := &kvproxyTestServer{
 		kp: kvp,
