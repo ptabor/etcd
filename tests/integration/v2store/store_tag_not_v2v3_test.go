@@ -36,11 +36,11 @@ func newTestStore(t *testing.T, ns ...string) StoreCloser {
 	return &v2TestStore{v2store.New(ns...)}
 }
 
-// Ensure that the store can recover from a previously saved state.
+// TestStoreRecover ensures that the store can recover from a previously saved state.
 func TestStoreRecover(t *testing.T) {
 	s := newTestStore(t)
 	defer s.Close()
-	var eidx uint64 = 4
+	eidx := uint64(4)
 	s.Create("/foo", true, "", false, v2store.TTLOptionSet{ExpireTime: v2store.Permanent})
 	s.Create("/foo/x", false, "bar", false, v2store.TTLOptionSet{ExpireTime: v2store.Permanent})
 	s.Update("/foo/x", "barbar", v2store.TTLOptionSet{ExpireTime: v2store.Permanent})

@@ -20,9 +20,9 @@ import (
 	"testing"
 	"time"
 
+	"go.etcd.io/etcd/tests/v3/integration"
 	"go.etcd.io/etcd/v3/clientv3"
 	pb "go.etcd.io/etcd/v3/etcdserver/etcdserverpb"
-	"go.etcd.io/etcd/tests/v3/integration"
 	"go.etcd.io/etcd/v3/pkg/testutil"
 	"go.etcd.io/etcd/v3/proxy/grpcproxy"
 

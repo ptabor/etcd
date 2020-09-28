@@ -35,7 +35,7 @@ func TestMinExpireTime(t *testing.T) {
 	fc.Advance(5 * time.Second)
 	// Ensure it hasn't expired
 	s.DeleteExpiredKeys(fc.Now())
-	var eidx uint64 = 1
+	eidx := uint64(1)
 	e, err := s.Get("/foo", true, false)
 	testutil.AssertNil(t, err)
 	testutil.AssertEqual(t, e.EtcdIndex, eidx)
@@ -57,7 +57,7 @@ func TestStoreGetDirectory(t *testing.T) {
 	s.Create("/foo/baz/bat", false, "Y", false, TTLOptionSet{ExpireTime: Permanent})
 	s.Create("/foo/baz/_hidden", false, "*", false, TTLOptionSet{ExpireTime: Permanent})
 	s.Create("/foo/baz/ttl", false, "Y", false, TTLOptionSet{ExpireTime: fc.Now().Add(time.Second * 3)})
-	var eidx uint64 = 7
+	eidx := uint64(7)
 	e, err := s.Get("/foo", true, false)
 	testutil.AssertNil(t, err)
 	testutil.AssertEqual(t, e.EtcdIndex, eidx)
@@ -99,7 +99,7 @@ func TestStoreUpdateValueTTL(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64 = 2
+	eidx := uint64(2)
 	s.Create("/foo", false, "bar", false, TTLOptionSet{ExpireTime: Permanent})
 	_, err := s.Update("/foo", "baz", TTLOptionSet{ExpireTime: fc.Now().Add(500 * time.Millisecond)})
 	testutil.AssertNil(t, err)
@@ -119,7 +119,7 @@ func TestStoreUpdateDirTTL(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64 = 3
+	eidx := uint64(3)
 	_, err := s.Create("/foo", true, "", false, TTLOptionSet{ExpireTime: Permanent})
 	testutil.AssertNil(t, err)
 	_, err = s.Create("/foo/bar", false, "baz", false, TTLOptionSet{ExpireTime: Permanent})
@@ -145,7 +145,7 @@ func TestStoreWatchExpire(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64 = 3
+	eidx := uint64(3)
 	s.Create("/foo", false, "bar", false, TTLOptionSet{ExpireTime: fc.Now().Add(400 * time.Millisecond)})
 	s.Create("/foofoo", false, "barbarbar", false, TTLOptionSet{ExpireTime: fc.Now().Add(450 * time.Millisecond)})
 	s.Create("/foodir", true, "", false, TTLOptionSet{ExpireTime: fc.Now().Add(500 * time.Millisecond)})
@@ -183,7 +183,7 @@ func TestStoreWatchExpireRefresh(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64 = 2
+	eidx := uint64(2)
 	s.Create("/foo", false, "bar", false, TTLOptionSet{ExpireTime: fc.Now().Add(500 * time.Millisecond), Refresh: true})
 	s.Create("/foofoo", false, "barbarbar", false, TTLOptionSet{ExpireTime: fc.Now().Add(1200 * time.Millisecond), Refresh: true})
 
@@ -219,7 +219,7 @@ func TestStoreWatchExpireEmptyRefresh(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64
+	eidx := uint64(0)
 	s.Create("/foo", false, "bar", false, TTLOptionSet{ExpireTime: fc.Now().Add(500 * time.Millisecond), Refresh: true})
 	// Should be no-op
 	fc.Advance(200 * time.Millisecond)
@@ -244,7 +244,7 @@ func TestStoreWatchNoRefresh(t *testing.T) {
 	fc := newFakeClock()
 	s.clock = fc
 
-	var eidx uint64
+	eidx := uint64(0)
 	s.Create("/foo", false, "bar", false, TTLOptionSet{ExpireTime: fc.Now().Add(500 * time.Millisecond), Refresh: true})
 	// Should be no-op
 	fc.Advance(200 * time.Millisecond)
@@ -293,7 +293,7 @@ func TestStoreRecoverWithExpiration(t *testing.T) {
 
 	fc := newFakeClock()
 
-	var eidx uint64 = 4
+	eidx := uint64(4)
 	s.Create("/foo", true, "", false, TTLOptionSet{ExpireTime: Permanent})
 	s.Create("/foo/x", false, "bar", false, TTLOptionSet{ExpireTime: Permanent})
 	s.Create("/foo/y", false, "baz", false, TTLOptionSet{ExpireTime: fc.Now().Add(5 * time.Millisecond)})
