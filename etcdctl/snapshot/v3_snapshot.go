@@ -27,7 +27,6 @@ import (
 	"reflect"
 	"strings"
 
-	bolt "go.etcd.io/bbolt"
 	"github.com/ptabor/etcd/api/v3/etcdserverpb"
 	"github.com/ptabor/etcd/client/v3"
 	"github.com/ptabor/etcd/client/v3/snapshot"
@@ -46,6 +45,7 @@ import (
 	"github.com/ptabor/etcd/server/v3/mvcc/backend"
 	"github.com/ptabor/etcd/server/v3/wal"
 	"github.com/ptabor/etcd/server/v3/wal/walpb"
+	bolt "go.etcd.io/bbolt"
 	"go.uber.org/zap"
 )
 

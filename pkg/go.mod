@@ -13,8 +13,8 @@ require (
 )
 
 replace (
-	go.etcd.io/etcd => ./FORBIDDEN_DEPENDENCY
 	github.com/ptabor/etcd/api/v3 => ./FORBIDDEN_DEPENDENCY
 	github.com/ptabor/etcd/tests/v3 => ./FORBIDDEN_DEPENDENCY
 	github.com/ptabor/etcd/v3 => ./FORBIDDEN_DEPENDENCY
+	go.etcd.io/etcd => ./FORBIDDEN_DEPENDENCY
 )

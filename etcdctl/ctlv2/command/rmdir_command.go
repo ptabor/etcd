@@ -17,8 +17,8 @@ package command
 import (
 	"errors"
 
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 // NewRemoveDirCommand returns the CLI command for "rmdir".

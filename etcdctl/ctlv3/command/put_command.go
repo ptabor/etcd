@@ -19,8 +19,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/spf13/cobra"
 	"github.com/ptabor/etcd/client/v3"
+	"github.com/spf13/cobra"
 )
 
 var (

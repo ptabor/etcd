@@ -18,8 +18,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 // NewUpdateDirCommand returns the CLI command for "updatedir".

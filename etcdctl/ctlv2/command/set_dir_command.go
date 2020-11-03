@@ -15,8 +15,8 @@
 package command
 
 import (
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 // NewSetDirCommand returns the CLI command for "setDir".

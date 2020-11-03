@@ -17,8 +17,8 @@ package command
 import (
 	"fmt"
 
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 func NewLsCommand() cli.Command {

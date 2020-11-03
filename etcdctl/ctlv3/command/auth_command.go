@@ -17,8 +17,8 @@ package command
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
 	"github.com/ptabor/etcd/api/v3/v3rpc/rpctypes"
+	"github.com/spf13/cobra"
 )
 
 // NewAuthCommand returns the cobra command for "auth".

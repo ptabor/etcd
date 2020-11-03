@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 // NewGetCommand returns the CLI command for "get".

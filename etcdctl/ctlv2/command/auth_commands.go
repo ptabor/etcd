@@ -19,8 +19,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/urfave/cli"
 	"github.com/ptabor/etcd/client/v2"
+	"github.com/urfave/cli"
 )
 
 func NewAuthCommands() cli.Command {
