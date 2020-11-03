@@ -16,7 +16,7 @@ For example,
 import (
     "fmt"
 
-    "go.etcd.io/etcd/pkg/v3/adt"
+    "github.com/ptabor/etcd/pkg/v3/adt"
 )
 
 func main() {

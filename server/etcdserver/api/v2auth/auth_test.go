@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/server/v3/etcdserver"
-	"go.etcd.io/etcd/server/v3/etcdserver/api/v2error"
-	"go.etcd.io/etcd/server/v3/etcdserver/api/v2store"
+	"github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/server/v3/etcdserver"
+	"github.com/ptabor/etcd/server/v3/etcdserver/api/v2error"
+	"github.com/ptabor/etcd/server/v3/etcdserver/api/v2store"
 
 	"go.uber.org/zap"
 )

@@ -1,4 +1,4 @@
-module go.etcd.io/etcd/raft/v3
+module github.com/ptabor/etcd/raft/v3
 
 go 1.15
 
@@ -7,13 +7,13 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.5
 	github.com/pkg/errors v0.9.1 // indirect
-	go.etcd.io/etcd/pkg/v3 v3.0.0-00010101000000-000000000000
+	github.com/ptabor/etcd/pkg/v3 v3.0.0-00010101000000-000000000000
 )
 
 // Bad imports are sometimes causing attempts to pull that code.
 // This makes the error more explicit.
 replace go.etcd.io/etcd => ./FORBIDDEN_DEPENDENCY
 
-replace go.etcd.io/etcd/v3 => ./FORBIDDEN_DEPENDENCY
+replace github.com/ptabor/etcd/v3 => ./FORBIDDEN_DEPENDENCY
 
-replace go.etcd.io/etcd/pkg/v3 => ../pkg
+replace github.com/ptabor/etcd/pkg/v3 => ../pkg

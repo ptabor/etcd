@@ -19,9 +19,9 @@ import (
 	"errors"
 	"fmt"
 
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/api/v3/mvccpb"
-	v3 "go.etcd.io/etcd/client/v3"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/api/v3/mvccpb"
+	v3 "github.com/ptabor/etcd/client/v3"
 )
 
 var (

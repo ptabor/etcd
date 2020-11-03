@@ -23,7 +23,7 @@ import (
 	"reflect"
 	"testing"
 
-	"go.etcd.io/etcd/pkg/v3/types"
+	"github.com/ptabor/etcd/pkg/v3/types"
 )
 
 func TestMembersAPIActionList(t *testing.T) {
