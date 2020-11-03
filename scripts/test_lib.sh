@@ -105,6 +105,11 @@ function pkgs_in_module {
   go list -mod=mod "${1:-./...}";
 }
 
+# Prints subdirectory (from the repo root) for the current module.
+function module_subdir {
+  relativePath "${ETCD_ROOT_DIR}" "${PWD}"
+}
+
 ####    Running actions against multiple modules ####
 
 # run [command...] - runs given command, printing it first and
@@ -114,7 +119,7 @@ function pkgs_in_module {
 function run {
   local rpath
   local command
-  rpath=$(relativePath "${ETCD_ROOT_DIR}" "${PWD}")
+  rpath=$(module_subdir)
   # Quoting all components as the commands are fully copy-parsable:
   command=("${@}")
   command=("${command[@]@Q}")

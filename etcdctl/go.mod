@@ -7,12 +7,12 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/ptabor/etcd/api/v3 v3.5.0-pre
-	github.com/ptabor/etcd/client/v2 v2.305.0-pre
-	github.com/ptabor/etcd/client/v3 v3.5.0-pre
-	github.com/ptabor/etcd/pkg/v3 v3.5.0-pre
-	github.com/ptabor/etcd/raft/v3 v3.5.0-pre
-	github.com/ptabor/etcd/server/v3 v3.5.0-pre
+	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.0
+	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.0
+	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.0
+	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.0
+	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.0
+	github.com/ptabor/etcd/server/v3 v3.5.0-alpha.0
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	github.com/urfave/cli v1.22.4
