@@ -21,9 +21,9 @@ import (
 	"os"
 	"sync"
 
-	"go.etcd.io/etcd/pkg/v3/crc"
-	"go.etcd.io/etcd/pkg/v3/ioutil"
-	"go.etcd.io/etcd/server/v3/wal/walpb"
+	"github.com/ptabor/etcd/pkg/v3/crc"
+	"github.com/ptabor/etcd/pkg/v3/ioutil"
+	"github.com/ptabor/etcd/server/v3/wal/walpb"
 )
 
 // walPageBytes is the alignment for flushing records to the backing Writer.

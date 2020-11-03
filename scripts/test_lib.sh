@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPO="go.etcd.io/etcd"
+REPO="github.com/ptabor/etcd"
 
 if [[ "$(go list)" != "${REPO}/v3" ]]; then
   echo "must be run from '${REPO}/v3' module directory"

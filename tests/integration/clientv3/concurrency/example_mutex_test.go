@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"log"
 
-	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/concurrency"
+	"github.com/ptabor/etcd/client/v3"
+	"github.com/ptabor/etcd/client/v3/concurrency"
 )
 
 func mockMutex_TryLock() {
