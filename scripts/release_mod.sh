@@ -44,7 +44,7 @@ function update_module_version() {
   local v3version="${1}"
   local v2version="${2}"
   local modules
-  modules=$(run go list -f '{{if not .Main}}{{if not .Indirect}}{{.Path}}{{end}}{{end}}' -m all)
+  modules=$(run go list '{{if not .Main}}{{if not .Indirect}}{{.Path}}{{end}}{{end}}' -m all)
 
   v3deps=$(echo "${modules}" | grep -E "${REPO}/.*/v3")
   for dep in ${v3deps}; do
