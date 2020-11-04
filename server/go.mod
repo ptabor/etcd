@@ -21,17 +21,17 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.10.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
+	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.1
+	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.1
+	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.1
+	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.1
+	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.1
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/cobra v1.1.1
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20200427203606-3cfed13b9966
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2
 	go.etcd.io/bbolt v1.3.5
-	github.com/ptabor/etcd/api/v3 v3.0.0-00010101000000-000000000000
-	github.com/ptabor/etcd/client/v2 v2.0.0-00010101000000-000000000000
-	github.com/ptabor/etcd/client/v3 v3.0.0-00010101000000-000000000000
-	github.com/ptabor/etcd/pkg/v3 v3.0.0-00010101000000-000000000000
-	github.com/ptabor/etcd/raft/v3 v3.0.0-00010101000000-000000000000
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
