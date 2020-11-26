@@ -112,8 +112,8 @@ main() {
     # Push the version change if it's not already been pushed.
     if [ "$(git rev-list --count "origin/${BRANCH}..${BRANCH}")" -gt 0 ]; then
       read -p "Push version bump up to ${VERSION} to '$(git remote get-url origin)' [y/N]? " -r confirm
- #     [[ "${confirm,,}" == "y" ]] || exit 1
- #     git push
+      [[ "${confirm,,}" == "y" ]] || exit 1
+      git push
     fi
 
     # Tag release.
@@ -122,12 +122,6 @@ main() {
     else
       log_callout "Tagging release..."
       REMOTE_REPO="origin" DRY_RUN=false ./scripts/release_mod.sh push_mod_tags
-#      KEYID=$(gpg --list-keys --with-colons| awk -F: '/^pub:/ { print $5 }')
-#      if [[ -z "${KEYID}" ]]; then
-#        echo "Failed to load gpg key. Is gpg set up correctly for etcd releases?"
-#        exit 1
-#      fi
-#      git tag --local-user "${KEYID}" --sign "${RELEASE_VERSION}" --message "${RELEASE_VERSION}"
     fi
 
     # Verify the latest commit has the version tag
@@ -138,16 +132,11 @@ main() {
     fi
 
     # Verify the version tag is on the right branch
-    local branch=$(git branch --contains "${RELEASE_VERSION}")
+    local branch=$(git for-each-ref --contains "${RELEASE_VERSION}" --format="%(refname)" 'refs/heads' | cut -d '/' -f 3)
     if [ "${branch}" != "${BRANCH}" ]; then
-      echo "Error: Git tag ${RELEASE_VERSION} should be on branch release-${MINOR_VERSION} but is on ${branch}"
+      echo "Error: Git tag ${RELEASE_VERSION} should be on branch '${BRANCH}' but is on '${branch}'"
       exit 1
     fi
-
-    # Push the tag change if it's not already been pushed.
-    read -p "Push etcd ${RELEASE_VERSION} tag [y/N]? " -r confirm
-    [[ "${confirm,,}" == "y" ]] || exit 1
-    git push origin "tags/${RELEASE_VERSION}"
   fi
 
   # Build release.
