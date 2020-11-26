@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 source ./scripts/test_lib.sh
 
 GIT_SHA=$(git rev-parse --short HEAD || echo "GitNotFound")

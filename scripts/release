@@ -51,7 +51,7 @@ main() {
     run git clone "${REPOSITORY}" --branch "${BRANCH}"
   fi
   run cd "${reldir}/etcd" || exit 2
-  run git pull
+  run git pull origin
   run git reset --hard
 
   # If a release version tag already exists, use it.

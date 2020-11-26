@@ -7,7 +7,7 @@ if [[ "$(go list)" != "${ROOT_MODULE}/v3" ]]; then
   exit 255
 fi
 
-ETCD_ROOT_DIR=$(go list -f '{{.Dir}}' "${REPO}/v3")
+ETCD_ROOT_DIR=$(go list -f '{{.Dir}}' "${ROOT_MODULE}/v3")
 
 ####   Convenient IO methods #####
 
