@@ -303,10 +303,10 @@ function tool_get_bin {
   local tool="$1"
   if [[ "$tool" == *"@"* ]]; then
     # shellcheck disable=SC2086
-    run gobin ${GOBINARGS} -p "${tool}" || return 2
+    run gobin ${GOBINARGS:-} -p "${tool}" || return 2
   else
     # shellcheck disable=SC2086
-    run_for_module ./tools/mod run gobin ${GOBINARGS} -p -m --mod=readonly "${tool}" || return 2
+    run_for_module ./tools/mod run gobin ${GOBINARGS:-} -p -m --mod=readonly "${tool}" || return 2
   fi
 }
 

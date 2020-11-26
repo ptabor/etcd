@@ -17,6 +17,7 @@ require (
 	github.com/bgentry/speakeasy v0.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mikefarah/yq/v3 v3.0.0-20201125113350-f42728eef735 // indirect
 	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.4
 	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.4
 	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.4

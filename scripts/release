@@ -4,6 +4,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+source ./scripts/test_lib.sh
+
 help() {
   echo "$(basename "$0") [version]"
   echo "Release etcd using the same approach as the etcd-release-runbook (https://goo.gl/Gxwysq)"
@@ -30,7 +32,8 @@ main() {
   fi
   RELEASE_VERSION="v${VERSION}"
   MINOR_VERSION=$(echo "${VERSION}" | cut -d. -f 1-2)
-  BRANCH="release-${MINOR_VERSION}"
+  BRANCH=${BRANCH:-"release-${MINOR_VERSION}"}
+  REPOSITORY=${REPOSITORY:-"https://github.com/etcd-io/etcd.git"}
 
   if ! command -v docker >/dev/null; then
     echo "cannot find docker"
@@ -45,22 +48,24 @@ main() {
   if [ ! -d "${reldir}/etcd" ]; then
     mkdir -p "${reldir}"
     cd "${reldir}"
-    git clone https://github.com/etcd-io/etcd.git --branch "${BRANCH}"
+    run git clone "${REPOSITORY}" --branch "${BRANCH}"
   fi
-  cd "${reldir}/etcd"
+  run cd "${reldir}/etcd"
 
   # If a release version tag already exists, use it.
   local remote_tag_exists
-  remote_tag_exists=$(git ls-remote origin "refs/tags/${RELEASE_VERSION}" | grep -c "${RELEASE_VERSION}")
+  remote_tag_exists=$(run git ls-remote origin "refs/tags/${RELEASE_VERSION}" | grep -c "${RELEASE_VERSION}" || true)
+
   if [ "${remote_tag_exists}" -gt 0 ]; then
-    echo "Release version tag exists on remote. Checking out refs/tags/${RELEASE_VERSION}"
+    log_callout "Release version tag exists on remote. Checking out refs/tags/${RELEASE_VERSION}"
     git checkout -q "tags/${RELEASE_VERSION}"
   fi
 
   # Check go version.
-  # download "yq" from https://github.com/mikefarah/yq
+  tool_exists "yq" 'download "yq" from https://github.com/mikefarah/yq'
+
   local go_version current_go_version
-  go_version="go$(yq read .travis.yml "go[0]")"
+  go_version="go$(run_go_tool "github.com/mikefarah/yq/v3" read .travis.yml "go[0]")"
   current_go_version=$(go version | awk '{ print $3 }')
   if [[ "${current_go_version}" != "${go_version}" ]]; then
     echo "Current go version is ${current_go_version}, but etcd ${RELEASE_VERSION} requires ${go_version} (see .travis.yml)."
