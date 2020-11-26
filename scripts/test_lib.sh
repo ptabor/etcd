@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-REPO="github.com/ptabor/etcd"
+ROOT_MODULE="github.com/ptabor/etcd"
 
-if [[ "$(go list)" != "${REPO}/v3" ]]; then
-  echo "must be run from '${REPO}/v3' module directory"
+if [[ "$(go list)" != "${ROOT_MODULE}/v3" ]]; then
+  echo "must be run from '${ROOT_MODULE}/v3' module directory"
   exit 255
 fi
 
@@ -160,15 +160,15 @@ function run_for_module {
 
 function modules() {
   modules=(
-    "${REPO}/api/v3"
-    "${REPO}/pkg/v3"
-    "${REPO}/raft/v3"
-    "${REPO}/client/v2"
-    "${REPO}/client/v3"
-    "${REPO}/server/v3"
-    "${REPO}/etcdctl/v3"
-    "${REPO}/tests/v3"
-    "${REPO}/v3")
+    "${ROOT_MODULE}/api/v3"
+    "${ROOT_MODULE}/pkg/v3"
+    "${ROOT_MODULE}/raft/v3"
+    "${ROOT_MODULE}/client/v2"
+    "${ROOT_MODULE}/client/v3"
+    "${ROOT_MODULE}/server/v3"
+    "${ROOT_MODULE}/etcdctl/v3"
+    "${ROOT_MODULE}/tests/v3"
+    "${ROOT_MODULE}/v3")
   echo "${modules[@]}"
 }
 
