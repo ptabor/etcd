@@ -21,13 +21,13 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/prometheus/client_golang v1.5.1
-	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.17
-	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.17
-	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.17
-	github.com/ptabor/etcd/etcdctl/v3 v3.5.0-alpha.17
-	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.17
-	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.17
-	github.com/ptabor/etcd/server/v3 v3.5.0-alpha.17
+	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.18
+	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.18
+	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.18
+	github.com/ptabor/etcd/etcdctl/v3 v3.5.0-alpha.18
+	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.18
+	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.18
+	github.com/ptabor/etcd/server/v3 v3.5.0-alpha.18
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
