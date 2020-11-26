@@ -121,6 +121,7 @@ function push_mod_tags_cmd {
     fi
 
     log_info "Tags for: ${module} version:${version} tag:${tag}"
+    sleep 2
     maybe_run git tag --local-user "${keyid}" --sign "${tag}" --message "${version}"
     tags=("${tags[@]}" "${tag}")
   done
