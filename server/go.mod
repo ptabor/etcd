@@ -21,11 +21,11 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.10.0 // indirect
 	github.com/prometheus/procfs v0.2.0 // indirect
-	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.16
-	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.16
-	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.16
-	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.16
-	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.16
+	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.17
+	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.17
+	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.17
+	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.17
+	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.17
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/soheilhy/cmux v0.1.4
 	github.com/spf13/cobra v1.1.1
