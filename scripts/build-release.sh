@@ -24,8 +24,8 @@ pushd "${ETCD_ROOT}" >/dev/null
   log_callout "Building etcd binary..."
   ./scripts/build-binary "${VERSION}"
 
-  for TARGET_ARCH in "amd64" "arm64" "ppc64le" "s390x"; do
-    echo Building ${TARGET_ARCH} docker image...
+  for TARGET_ARCH in "amd64" "arm64" "ppc64le"; do
+    log_callout "Building ${TARGET_ARCH} docker image..."
     GOOS=linux GOARCH=${TARGET_ARCH} BINARYDIR=release/etcd-${VERSION}-linux-${TARGET_ARCH} BUILDDIR=release ./scripts/build-docker "${VERSION}"
   done
 popd >/dev/null
