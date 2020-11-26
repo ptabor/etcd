@@ -21,8 +21,8 @@ import (
 	"os"
 	"strconv"
 
-	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/etcdctl/v3/snapshot"
+	"github.com/ptabor/etcd/client/v3"
+	"github.com/ptabor/etcd/etcdctl/v3/snapshot"
 )
 
 type jsonPrinter struct {

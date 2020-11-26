@@ -21,10 +21,10 @@ import (
 	"os"
 	"sync"
 
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
-	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/naming"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/api/v3/v3rpc/rpctypes"
+	"github.com/ptabor/etcd/client/v3"
+	"github.com/ptabor/etcd/client/v3/naming"
 
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"

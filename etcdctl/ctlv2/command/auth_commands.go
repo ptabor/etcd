@@ -19,8 +19,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ptabor/etcd/client/v2"
 	"github.com/urfave/cli"
-	"go.etcd.io/etcd/client/v2"
 )
 
 func NewAuthCommands() cli.Command {

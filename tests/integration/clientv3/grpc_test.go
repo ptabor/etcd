@@ -20,10 +20,10 @@ import (
 	"reflect"
 	"testing"
 
-	etcd "go.etcd.io/etcd/client/v3"
-	namingv3 "go.etcd.io/etcd/client/v3/naming"
-	"go.etcd.io/etcd/pkg/v3/testutil"
-	"go.etcd.io/etcd/tests/v3/integration"
+	etcd "github.com/ptabor/etcd/client/v3"
+	namingv3 "github.com/ptabor/etcd/client/v3/naming"
+	"github.com/ptabor/etcd/pkg/v3/testutil"
+	"github.com/ptabor/etcd/tests/v3/integration"
 
 	"google.golang.org/grpc/naming"
 )

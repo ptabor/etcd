@@ -17,9 +17,9 @@ package recipe
 import (
 	"context"
 
-	"go.etcd.io/etcd/api/v3/mvccpb"
-	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/concurrency"
+	"github.com/ptabor/etcd/api/v3/mvccpb"
+	"github.com/ptabor/etcd/client/v3"
+	"github.com/ptabor/etcd/client/v3/concurrency"
 )
 
 // DoubleBarrier blocks processes on Enter until an expected count enters, then

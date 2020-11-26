@@ -18,10 +18,10 @@ import (
 	"context"
 	"io"
 
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
-	"go.etcd.io/etcd/server/v3/etcdserver"
-	"go.etcd.io/etcd/server/v3/lease"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/api/v3/v3rpc/rpctypes"
+	"github.com/ptabor/etcd/server/v3/etcdserver"
+	"github.com/ptabor/etcd/server/v3/lease"
 
 	"go.uber.org/zap"
 )

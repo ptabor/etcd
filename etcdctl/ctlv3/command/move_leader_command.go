@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/ptabor/etcd/client/v3"
 	"github.com/spf13/cobra"
-	"go.etcd.io/etcd/client/v3"
 )
 
 // NewMoveLeaderCommand returns the cobra command for "move-leader".
