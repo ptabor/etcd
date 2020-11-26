@@ -2,10 +2,10 @@
 
 set -e
 
-source ./scripts/tests_lib.sh
+source ./scripts/test_lib.sh
 
 VER=$1
-REPOSITORY="${:-https://github.com/etcd-io/etcd}"
+REPOSITORY="${REPOSITORY:-https://github.com/etcd-io/etcd}"
 
 
 if [ -z "$1" ]; then
@@ -17,6 +17,7 @@ set -u
 
 function setup_env {
 	local ver=${1}
+	local proj=${2}
 
 	if [ ! -d "${proj}" ]; then
 		run git clone "${REPOSITORY}"
@@ -55,9 +56,11 @@ function package {
 }
 
 function main {
-	mkdir release
+  local proj=$(echo "${REPOSITORY}" | sed 's|^.*/\([^/]*\)$|\1|g')
+
+	mkdir -p release
 	cd release
-	setup_env "${VER}"
+	setup_env "${VER}" "${proj}"
 
 	tarcmd=tar
 	if [[ $(go env GOOS) == "darwin" ]]; then
@@ -72,7 +75,7 @@ function main {
 		if [ ${GOOS} == "linux" ]; then
 			TARGET_ARCHS+=("arm64")
 			TARGET_ARCHS+=("ppc64le")
-			TARGET_ARCHS+=("s390x")
+#			TARGET_ARCHS+=("s390x")
 		fi
 
 		for TARGET_ARCH in "${TARGET_ARCHS[@]}"; do
@@ -84,7 +87,7 @@ function main {
 
 			TARGET="etcd-${VER}-${GOOS}-${GOARCH}"
 			mkdir "${TARGET}"
-			package "${TARGET}" "${PROJ}"
+			package "${TARGET}" "${proj}"
 
 			if [ ${GOOS} == "linux" ]; then
 				${tarcmd} cfz "${TARGET}.tar.gz" "${TARGET}"
