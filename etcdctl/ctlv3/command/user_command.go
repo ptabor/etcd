@@ -20,8 +20,8 @@ import (
 	"strings"
 
 	"github.com/bgentry/speakeasy"
+	"github.com/ptabor/etcd/client/v3"
 	"github.com/spf13/cobra"
-	"go.etcd.io/etcd/client/v3"
 )
 
 var (

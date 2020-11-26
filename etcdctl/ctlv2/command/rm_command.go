@@ -17,8 +17,8 @@ package command
 import (
 	"errors"
 
+	"github.com/ptabor/etcd/client/v2"
 	"github.com/urfave/cli"
-	"go.etcd.io/etcd/client/v2"
 )
 
 // NewRemoveCommand returns the CLI command for "rm".

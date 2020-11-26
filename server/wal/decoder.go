@@ -21,10 +21,10 @@ import (
 	"io"
 	"sync"
 
-	"go.etcd.io/etcd/pkg/v3/crc"
-	"go.etcd.io/etcd/pkg/v3/pbutil"
-	"go.etcd.io/etcd/raft/v3/raftpb"
-	"go.etcd.io/etcd/server/v3/wal/walpb"
+	"github.com/ptabor/etcd/pkg/v3/crc"
+	"github.com/ptabor/etcd/pkg/v3/pbutil"
+	"github.com/ptabor/etcd/raft/v3/raftpb"
+	"github.com/ptabor/etcd/server/v3/wal/walpb"
 )
 
 const minSectorSize = 512

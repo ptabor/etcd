@@ -22,13 +22,13 @@ import (
 	"testing"
 	"time"
 
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
-	"go.etcd.io/etcd/pkg/v3/testutil"
-	"go.etcd.io/etcd/pkg/v3/traceutil"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
-	"go.etcd.io/etcd/server/v3/mvcc"
-	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/api/v3/v3rpc/rpctypes"
+	"github.com/ptabor/etcd/pkg/v3/testutil"
+	"github.com/ptabor/etcd/pkg/v3/traceutil"
+	"github.com/ptabor/etcd/server/v3/etcdserver/cindex"
+	"github.com/ptabor/etcd/server/v3/mvcc"
+	"github.com/ptabor/etcd/server/v3/mvcc/backend"
 
 	"go.uber.org/zap"
 )

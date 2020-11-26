@@ -17,10 +17,10 @@
 package integration
 
 import (
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/server/v3/etcdserver/api/v3election/v3electionpb"
-	"go.etcd.io/etcd/server/v3/etcdserver/api/v3lock/v3lockpb"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/client/v3"
+	"github.com/ptabor/etcd/server/v3/etcdserver/api/v3election/v3electionpb"
+	"github.com/ptabor/etcd/server/v3/etcdserver/api/v3lock/v3lockpb"
 )
 
 const ThroughProxy = false

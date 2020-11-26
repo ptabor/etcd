@@ -17,8 +17,8 @@ package grpcproxy
 import (
 	"context"
 
-	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/client/v3"
+	pb "github.com/ptabor/etcd/api/v3/etcdserverpb"
+	"github.com/ptabor/etcd/client/v3"
 )
 
 type AuthProxy struct {

@@ -19,7 +19,7 @@ package httptypes
 import (
 	"encoding/json"
 
-	"go.etcd.io/etcd/pkg/v3/types"
+	"github.com/ptabor/etcd/pkg/v3/types"
 )
 
 type Member struct {

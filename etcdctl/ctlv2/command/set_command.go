@@ -19,8 +19,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/ptabor/etcd/client/v2"
 	"github.com/urfave/cli"
-	"go.etcd.io/etcd/client/v2"
 )
 
 // NewSetCommand returns the CLI command for "set".
