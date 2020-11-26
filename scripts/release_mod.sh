@@ -46,12 +46,12 @@ function update_module_version() {
   local modules
   modules=$(run go list -f '{{if not .Main}}{{if not .Indirect}}{{.Path}}{{end}}{{end}}' -m all)
 
-  v3deps=$(echo "${modules}" | grep -E "${REPO}/.*/v3")
+  v3deps=$(echo "${modules}" | grep -E "${ROOT_MODULE}/.*/v3")
   for dep in ${v3deps}; do
     maybe_run go mod edit -require "${dep}@${v3version}"
   done
 
-  v2deps=$(echo "${modules}" | grep -E "${REPO}/.*/v2")
+  v2deps=$(echo "${modules}" | grep -E "${ROOT_MODULE}/.*/v2")
   for dep in ${v2deps}; do
     maybe_run go mod edit -require "${dep}@${v2version}"
   done
@@ -101,7 +101,7 @@ function push_mod_tags_cmd {
 
   # Any module ccan be used for this
   local master_version
-  master_version=$(go list -f '{{.Version}}' -m "${REPO}/api/v3")
+  master_version=$(go list -f '{{.Version}}' -m "${ROOT_MODULE}/api/v3")
   local tags=()
 
   keyid=$(get_gpg_key) || return 2
@@ -111,7 +111,7 @@ function push_mod_tags_cmd {
     version=$(go list -f '{{.Version}}' -m "${module}")
     local path
     path=$(go list -f '{{.Path}}' -m "${module}")
-    local subdir="${path//${REPO}\//}"
+    local subdir="${path//${ROOT_MODULE}\//}"
     local tag
     if [ -z "${version}" ]; then
       tag="${master_version}"
