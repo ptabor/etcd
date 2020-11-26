@@ -4,6 +4,7 @@
 # Run from repository root.
 #
 set -e
+set +x
 
 VERSION=$1
 if [ -z "${VERSION}" ]; then
@@ -19,7 +20,7 @@ fi
 ETCD_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 pushd "${ETCD_ROOT}" >/dev/null
-  echo Building etcd binary...
+  log_collout "Building etcd binary..."
   ./scripts/build-binary "${VERSION}"
 
   for TARGET_ARCH in "amd64" "arm64" "ppc64le" "s390x"; do

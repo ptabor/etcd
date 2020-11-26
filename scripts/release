@@ -33,7 +33,7 @@ main() {
   RELEASE_VERSION="v${VERSION}"
   MINOR_VERSION=$(echo "${VERSION}" | cut -d. -f 1-2)
   BRANCH=${BRANCH:-"release-${MINOR_VERSION}"}
-  REPOSITORY=${REPOSITORY:-"https://github.com/etcd-io/etcd.git"}
+  REPOSITORY=${REPOSITORY:-"https://github.com/etcd-io/etcd"}
 
   if ! command -v docker >/dev/null; then
     echo "cannot find docker"
@@ -142,16 +142,10 @@ main() {
   # Build release.
   # TODO: check the release directory for all required build artifacts.
   if [ -d release ]; then
-    echo "Skipping release build step. /release directory already exists."
+    log_warning "Skipping release build step. /release directory already exists."
   else
-    echo "Building release..."
-    # Check for old and new names of the release build script.
-    # TODO: Move the release script into this on as a function?
-    if [ -f ./scripts/release.sh ]; then
-      ./scripts/release.sh "${RELEASE_VERSION}"
-    else
-      ./scripts/build-release.sh "${RELEASE_VERSION}"
-    fi
+    log_callout "Building release..."
+    REPOSITORY=${REPOSITORY} ./scripts/build-release.sh "${RELEASE_VERSION}"
   fi
 
   # Sanity checks.
