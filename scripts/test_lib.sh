@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-REPO="go.etcd.io/etcd"
+ROOT_MODULE="go.etcd.io/etcd"
 
-if [[ "$(go list)" != "${REPO}/v3" ]]; then
-  echo "must be run from '${REPO}/v3' module directory"
+if [[ "$(go list)" != "${ROOT_MODULE}/v3" ]]; then
+  echo "must be run from '${ROOT_MODULE}/v3' module directory"
   exit 255
 fi
 
-ETCD_ROOT_DIR=$(go list -f '{{.Dir}}' "${REPO}/v3")
+ETCD_ROOT_DIR=$(go list -f '{{.Dir}}' "${ROOT_MODULE}/v3")
 
 ####   Convenient IO methods #####
 
@@ -160,15 +160,15 @@ function run_for_module {
 
 function modules() {
   modules=(
-    "${REPO}/api/v3"
-    "${REPO}/pkg/v3"
-    "${REPO}/raft/v3"
-    "${REPO}/client/v2"
-    "${REPO}/client/v3"
-    "${REPO}/server/v3"
-    "${REPO}/etcdctl/v3"
-    "${REPO}/tests/v3"
-    "${REPO}/v3")
+    "${ROOT_MODULE}/api/v3"
+    "${ROOT_MODULE}/pkg/v3"
+    "${ROOT_MODULE}/raft/v3"
+    "${ROOT_MODULE}/client/v2"
+    "${ROOT_MODULE}/client/v3"
+    "${ROOT_MODULE}/server/v3"
+    "${ROOT_MODULE}/etcdctl/v3"
+    "${ROOT_MODULE}/tests/v3"
+    "${ROOT_MODULE}/v3")
   echo "${modules[@]}"
 }
 
@@ -303,10 +303,10 @@ function tool_get_bin {
   local tool="$1"
   if [[ "$tool" == *"@"* ]]; then
     # shellcheck disable=SC2086
-    run gobin ${GOBINARGS} -p "${tool}" || return 2
+    run gobin ${GOBINARGS:-} -p "${tool}" || return 2
   else
     # shellcheck disable=SC2086
-    run_for_module ./tools/mod run gobin ${GOBINARGS} -p -m --mod=readonly "${tool}" || return 2
+    run_for_module ./tools/mod run gobin ${GOBINARGS:-} -p -m --mod=readonly "${tool}" || return 2
   fi
 }
 
