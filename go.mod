@@ -17,13 +17,13 @@ require (
 	github.com/bgentry/speakeasy v0.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/ptabor/etcd/api/v3 v3.5.0-pre
-	github.com/ptabor/etcd/client/v2 v2.305.0-pre
-	github.com/ptabor/etcd/client/v3 v3.5.0-pre
-	github.com/ptabor/etcd/pkg/v3 v3.5.0-pre
-	github.com/ptabor/etcd/raft/v3 v3.5.0-pre
-	github.com/ptabor/etcd/server/v3 v3.5.0-pre
-	github.com/ptabor/etcd/tests/v3 v3.5.0-pre
+	github.com/ptabor/etcd/api/v3 v3.5.0-alpha.22
+	github.com/ptabor/etcd/client/v2 v2.305.0-alpha.22
+	github.com/ptabor/etcd/client/v3 v3.5.0-alpha.22
+	github.com/ptabor/etcd/pkg/v3 v3.5.0-alpha.22
+	github.com/ptabor/etcd/raft/v3 v3.5.0-alpha.22
+	github.com/ptabor/etcd/server/v3 v3.5.0-alpha.22
+	github.com/ptabor/etcd/tests/v3 v3.5.0-alpha.22
 	github.com/spf13/cobra v1.1.1
 	go.etcd.io/bbolt v1.3.5
 	go.uber.org/zap v1.16.0
