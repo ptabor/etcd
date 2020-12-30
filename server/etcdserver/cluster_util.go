@@ -42,13 +42,7 @@ func isMemberBootstrapped(lg *zap.Logger, cl *membership.RaftCluster, member str
 	}
 	id := cl.MemberByName(member).ID
 	m := rcl.Member(id)
-	if m == nil {
-		return false
-	}
-	if len(m.ClientURLs) > 0 {
-		return true
-	}
-	return false
+	return m != nil && len(m.ClientURLs) > 0
 }
 
 // GetClusterFromRemotePeers takes a set of URLs representing etcd peers, and

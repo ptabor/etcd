@@ -436,6 +436,10 @@ func (w *WAL) ReadAll() (metadata []byte, state raftpb.HardState, ents []raftpb.
 		case entryType:
 			e := mustUnmarshalEntry(rec.Data)
 			// 0 <= e.Index-w.start.Index - 1 < len(ents)
+
+			// We skip only entries that precedes a 'snapshot' we used to open the index file,
+			// no filtering based on 'terms' or 'overwritten' entries.
+
 			if e.Index > w.start.Index {
 				// prevent "panic: runtime error: slice bounds out of range [:13038096702221461992] with capacity 0"
 				up := e.Index - w.start.Index - 1
@@ -668,6 +672,7 @@ func Verify(lg *zap.Logger, walDir string, snap walpb.Snapshot) error {
 		// We ignore all entry and state type records as these
 		// are not necessary for validating the WAL contents
 		case entryType:
+			// Here also we don't validate 'sequentiality' of indexes...
 		case stateType:
 		default:
 			return fmt.Errorf("unexpected block type %d", rec.Type)
@@ -878,6 +883,9 @@ func (w *WAL) Close() error {
 }
 
 func (w *WAL) saveEntry(e *raftpb.Entry) error {
+	// WAL is append only... We never override entries.
+	// We also don't validate whether indexes are sequential.
+
 	// TODO: add MustMarshalTo to reduce one allocation.
 	b := pbutil.MustMarshal(e)
 	rec := &walpb.Record{Type: entryType, Data: b}

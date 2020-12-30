@@ -135,6 +135,12 @@ func (u *unstable) truncateAndAppend(ents []pb.Entry) {
 		// truncate to after and copy to u.entries
 		// then append
 		u.logger.Infof("truncate the unstable entries before index %d", after)
+		// That's the place where 'not matching' entries are being dropped
+		// and overwritten with the new one.rs
+		// ??? I don't know what guarantees that such 'overwrites' happen to
+		// the 'unstable' entries and stable-storage entries needs to be overridden.
+
+		// Maybe we accepted existence of superflous entries and ignore them on read ?
 		u.entries = append([]pb.Entry{}, u.slice(u.offset, after)...)
 		u.entries = append(u.entries, ents...)
 	}

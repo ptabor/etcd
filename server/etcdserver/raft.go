@@ -217,6 +217,7 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 				updateCommittedIndex(&ap, rh)
 
 				select {
+				// OK: It only schedules application, but not making this blocking.
 				case r.applyc <- ap:
 				case <-r.stopped:
 					return

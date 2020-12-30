@@ -43,6 +43,7 @@ type ServerConfig struct {
 	// rather than the dataDir/member/wal.
 	DedicatedWALDir string
 
+	// Number of committed proposals to trigger a new snapshot.
 	SnapshotCount uint64
 
 	// SnapshotCatchUpEntries is the number of entries for a slow follower

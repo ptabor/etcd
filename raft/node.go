@@ -556,6 +556,17 @@ func (n *node) ReadIndex(ctx context.Context, rctx []byte) error {
 
 func newReady(r *raft, prevSoftSt *SoftState, prevHardSt pb.HardState) Ready {
 	rd := Ready{
+		// When new Ready is constructed (so (among others) request to
+		// put the entries into WAL), all the unstableEntries are scheduled for
+		// persistence.
+		// In particular there might be entries that
+		// are subject to be 'overwritten' but got already written to a stable
+		// storage. It might mean 2 things:
+		//  1. the entries got overwritten in unstableEntries before Advanced confirmed,
+		//     so another content (for the same indexes, but a different term) would be persisted.
+		//  2. the entries should be overwritten, but they got stored in stable storage and
+		//     advanced... so there is
+
 		Entries:          r.raftLog.unstableEntries(),
 		CommittedEntries: r.raftLog.nextEnts(),
 		Messages:         r.msgs,

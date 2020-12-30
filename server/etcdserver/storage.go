@@ -64,7 +64,7 @@ func (st *storage) SaveSnap(snap raftpb.Snapshot) error {
 	if err != nil {
 		return err
 	}
-	// gofail: var raftBeforeWALSaveSnaphot struct{}
+	// gofail: var raftBeforeWALSaveSnapshot struct{}
 
 	return st.WAL.SaveSnapshot(walsnap)
 }

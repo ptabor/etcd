@@ -28,7 +28,13 @@ import (
 // strewn around `*raft.raft`. Additionally, some fields are only used when in a
 // certain State. All of this isn't ideal.
 type Progress struct {
-	Match, Next uint64
+	// Highest log index acked/matching known to be replicated on server.
+	Match uint64
+
+	// Index of the next log entry to send to that server
+	// (initialized to leader last log index + 1)
+	Next uint64
+
 	// State defines how the leader should interact with the follower.
 	//
 	// When in StateProbe, leader sends at most one replication message

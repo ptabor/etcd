@@ -175,6 +175,12 @@ func (l matchAckIndexer) AckedIndex(id uint64) (quorum.Index, bool) {
 // Committed returns the largest log index known to be committed based on what
 // the voting members of the group have acknowledged.
 func (p *ProgressTracker) Committed() uint64 {
+	// To find what's the 'Committed' index we find the common index that
+	// quorum of voters agree.
+	//
+	// Raft paper: If there exists an N such that N > commitIndex, a majority
+	// of matchIndex[i] ≥ N, and log[N].term == currentTerm:
+	// set commitIndex = N (§5.3, §5.4).
 	return uint64(p.Voters.CommittedIndex(matchAckIndexer(p.Progress)))
 }
 

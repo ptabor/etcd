@@ -238,6 +238,10 @@ func (ms *MemoryStorage) Compact(compactIndex uint64) error {
 // Append the new entries to storage.
 // TODO (xiangli): ensure the entries are continuous and
 // entries[0].Index > ms.entries[0].Index
+
+// -> The TODO above seems that we don't control the continuity,
+// so we could bootstrap from WAL with wrong Terms and overlapping indexes
+// and don't spot the corruption.
 func (ms *MemoryStorage) Append(entries []pb.Entry) error {
 	if len(entries) == 0 {
 		return nil

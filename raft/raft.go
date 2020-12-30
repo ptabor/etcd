@@ -1138,6 +1138,9 @@ func stepLeader(r *raft, m pb.Message) error {
 			}
 		} else {
 			oldPaused := pr.IsPaused()
+			// That's the place where leader trust the "index" from pb.MsgAppResp
+			// This field is translated into pr.Match field,
+			// that is later used to compute the Commit index.
 			if pr.MaybeUpdate(m.Index) {
 				switch {
 				case pr.State == tracker.StateProbe:
@@ -1158,6 +1161,8 @@ func stepLeader(r *raft, m pb.Message) error {
 					pr.Inflights.FreeLE(m.Index)
 				}
 
+				// Leader is recomputing the 'Commit number' and
+				// if it changed, broadcasting to all the followers.
 				if r.maybeCommit() {
 					r.bcastAppend()
 				} else if oldPaused {
@@ -1378,6 +1383,7 @@ func (r *raft) handleAppendEntries(m pb.Message) {
 	}
 
 	if mlastIndex, ok := r.raftLog.maybeAppend(m.Index, m.LogTerm, m.Commit, m.Entries...); ok {
+		// Here we send mlastIndex as the point this follower has 'replicated'
 		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: mlastIndex})
 	} else {
 		r.logger.Debugf("%x [logterm: %d, index: %d] rejected MsgApp [logterm: %d, index: %d] from %x",

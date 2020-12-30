@@ -88,6 +88,8 @@ func (l *raftLog) String() string {
 func (l *raftLog) maybeAppend(index, logTerm, committed uint64, ents ...pb.Entry) (lastnewi uint64, ok bool) {
 	if l.matchTerm(index, logTerm) {
 		lastnewi = index + uint64(len(ents))
+		// We detect potential conflicts here,
+		// but the conflicts might be in both stable and ustanble storage !?
 		ci := l.findConflict(ents)
 		switch {
 		case ci == 0:
@@ -97,6 +99,8 @@ func (l *raftLog) maybeAppend(index, logTerm, committed uint64, ents ...pb.Entry
 			offset := index + 1
 			l.append(ents[ci-offset:]...)
 		}
+		// We trust the 'commit' information we received in msgApp and advance as much as we can.
+		// (that's OK)
 		l.commitTo(min(committed, lastnewi))
 		return lastnewi, true
 	}
