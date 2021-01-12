@@ -28,7 +28,7 @@ const (
 
 var noPrefixEnd = []byte{0}
 
-// Op represents an Operation that kv can execute.
+// Op represents an Op that kv can execute.
 type Op struct {
 	t   opType
 	key []byte
@@ -525,7 +525,7 @@ func WithIgnoreLease() OpOption {
 	}
 }
 
-// LeaseOp represents an Operation that lease can execute.
+// LeaseOp represents an Op that lease can execute.
 type LeaseOp struct {
 	id LeaseID
 

@@ -20,8 +20,7 @@ import (
 
 	"go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
-	"go.etcd.io/etcd/client/v3/naming"
-	gnaming "go.etcd.io/etcd/client/v3/naming/grpcnaming"
+	"go.etcd.io/etcd/client/v3/naming/endpoints"
 
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
@@ -68,8 +67,9 @@ func registerSession(lg *zap.Logger, c *clientv3.Client, prefix string, addr str
 		return nil, err
 	}
 
-	gr := &naming.GRPCResolver{Client: c}
-	if err = gr.Update(c.Ctx(), prefix, gnaming.Update{Op: gnaming.Add, Addr: addr, Metadata: getMeta()}, clientv3.WithLease(ss.Lease())); err != nil {
+	em := endpoints.NewManager(c, prefix)
+	endpoint := endpoints.Endpoint{Addr: addr, Metadata: getMeta()}
+	if err = endpoints.ManagerAddEndpoint(c.Ctx(), em, prefix, endpoint, clientv3.WithLease(ss.Lease())); err != nil {
 		return nil, err
 	}
 

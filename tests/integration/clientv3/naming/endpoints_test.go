@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package clientv3test
+package naming_test
 
 import (
 	"context"
-	"encoding/json"
 	"reflect"
 	"testing"
 
 	etcd "go.etcd.io/etcd/client/v3"
-	namingv3 "go.etcd.io/etcd/client/v3/naming"
-	gnaming "go.etcd.io/etcd/client/v3/naming/grpcnaming"
+	"go.etcd.io/etcd/client/v3/naming/endpoints"
 
 	"go.etcd.io/etcd/pkg/v3/testutil"
 	"go.etcd.io/etcd/tests/v3/integration"
@@ -34,56 +32,49 @@ func TestGRPCResolver(t *testing.T) {
 	clus := integration.NewClusterV3(t, &integration.ClusterConfig{Size: 1})
 	defer clus.Terminate(t)
 
-	r := namingv3.GRPCResolver{
-		Client: clus.RandClient(),
-	}
-
-	w, err := r.Resolve("foo")
-	if err != nil {
-		t.Fatal("failed to resolve foo", err)
-	}
+	em := endpoints.NewManager(clus.RandClient(), "foo")
+	w := em.NewWatcher(context.TODO())
 	defer w.Close()
 
-	addOp := gnaming.Update{Op: gnaming.Add, Addr: "127.0.0.1", Metadata: "metadata"}
-	err = r.Update(context.TODO(), "foo", addOp)
+	e1 := endpoints.Endpoint{Addr:"127.0.0.1", Metadata: "metadata"}
+	err := endpoints.ManagerAddEndpoint(context.TODO(), em, "foo/a1", e1);
 	if err != nil {
 		t.Fatal("failed to add foo", err)
 	}
 
-	us, err := w.Next()
-	if err != nil {
-		t.Fatal("failed to get udpate", err)
+	us := <- w.Channel();
+
+	if us == nil {
+		t.Fatal("failed to get update", err)
 	}
 
-	wu := &gnaming.Update{
-		Op:       gnaming.Add,
-		Addr:     "127.0.0.1",
-		Metadata: "metadata",
+	wu := endpoints.Update {
+		Op:       endpoints.Add,
+		Key:      "foo/a1",
+		Endpoint: e1,
 	}
 
 	if !reflect.DeepEqual(us[0], wu) {
 		t.Fatalf("up = %#v, want %#v", us[0], wu)
 	}
 
-	delOp := gnaming.Update{Op: gnaming.Delete, Addr: "127.0.0.1"}
-	err = r.Update(context.TODO(), "foo", delOp)
+	err = endpoints.ManagerDeleteEndpoint(context.TODO(), em, "foo/a1")
 	if err != nil {
 		t.Fatalf("failed to udpate %v", err)
 	}
 
-	us, err = w.Next()
+	us = <- w.Channel();
 	if err != nil {
 		t.Fatalf("failed to get udpate %v", err)
 	}
 
-	wu = &gnaming.Update{
-		Op:       gnaming.Delete,
-		Addr:     "127.0.0.1",
-		Metadata: "metadata",
+	wu = endpoints.Update{
+		Op:  endpoints.Delete,
+		Key: "foo/a1",
 	}
 
-	if !reflect.DeepEqual(us[0], wu) {
-		t.Fatalf("up = %#v, want %#v", us[0], wu)
+	if !reflect.DeepEqual(us, wu) {
+		t.Fatalf("up = %#v, want %#v", us[1], wu)
 	}
 }
 
@@ -95,31 +86,21 @@ func TestGRPCResolverMulti(t *testing.T) {
 
 	clus := integration.NewClusterV3(t, &integration.ClusterConfig{Size: 1})
 	defer clus.Terminate(t)
-	c := clus.RandClient()
 
-	v, verr := json.Marshal(gnaming.Update{Addr: "127.0.0.1", Metadata: "md"})
-	if verr != nil {
-		t.Fatal(verr)
-	}
-	if _, err := c.Put(context.TODO(), "foo/host", string(v)); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := c.Put(context.TODO(), "foo/host2", string(v)); err != nil {
-		t.Fatal(err)
-	}
+	c:=clus.RandClient()
+	em := endpoints.NewManager(c, "foo")
 
-	r := namingv3.GRPCResolver{Client: c}
-
-	w, err := r.Resolve("foo")
+	err := em.Update(context.TODO(), []endpoints.UpdateWithOpts{
+		endpoints.NewAddUpdateOpts("foo/host", endpoints.Endpoint{Addr: "127.0.0.1:2000"}),
+		endpoints.NewAddUpdateOpts("foo/host2", endpoints.Endpoint{Addr: "127.0.0.1:2001"})})
 	if err != nil {
-		t.Fatal("failed to resolve foo", err)
+		t.Fatal(err)
 	}
+
+	w := em.NewWatcher(context.TODO())
 	defer w.Close()
 
-	updates, nerr := w.Next()
-	if nerr != nil {
-		t.Fatal(nerr)
-	}
+	updates := <-w.Channel()
 	if len(updates) != 2 {
 		t.Fatalf("expected two updates, got %+v", updates)
 	}
@@ -129,11 +110,8 @@ func TestGRPCResolverMulti(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updates, nerr = w.Next()
-	if nerr != nil {
-		t.Fatal(nerr)
-	}
-	if len(updates) != 2 || (updates[0].Op != gnaming.Delete && updates[1].Op != gnaming.Delete) {
-		t.Fatalf("expected two updates, got %+v", updates)
+	updates = <-w.Channel()
+	if len(updates) != 2 || (updates[0].Op != endpoints.Delete && updates[1].Op != endpoints.Delete) {
+		t.Fatalf("expected two delete updates, got %+v", updates)
 	}
 }

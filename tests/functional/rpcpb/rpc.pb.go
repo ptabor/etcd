@@ -592,7 +592,7 @@ func (Case) EnumDescriptor() ([]byte, []int) {
 }
 
 type Request struct {
-	Operation Operation `protobuf:"varint,1,opt,name=Operation,proto3,enum=rpcpb.Operation" json:"Operation,omitempty"`
+	Operation Operation `protobuf:"varint,1,opt,name=Op,proto3,enum=rpcpb.Op" json:"Op,omitempty"`
 	// Member contains the same Member object from tester configuration.
 	Member *Member `protobuf:"bytes,2,opt,name=Member,proto3" json:"Member,omitempty"`
 	// Tester contains tester configuration.
@@ -1026,7 +1026,7 @@ var xxx_messageInfo_Etcd proto.InternalMessageInfo
 func init() {
 	proto.RegisterEnum("rpcpb.StresserType", StresserType_name, StresserType_value)
 	proto.RegisterEnum("rpcpb.Checker", Checker_name, Checker_value)
-	proto.RegisterEnum("rpcpb.Operation", Operation_name, Operation_value)
+	proto.RegisterEnum("rpcpb.Op", Operation_name, Operation_value)
 	proto.RegisterEnum("rpcpb.Case", Case_name, Case_value)
 	proto.RegisterType((*Request)(nil), "rpcpb.Request")
 	proto.RegisterType((*SnapshotInfo)(nil), "rpcpb.SnapshotInfo")
@@ -2877,7 +2877,7 @@ func (m *Request) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Operation", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Op", wireType)
 			}
 			m.Operation = 0
 			for shift := uint(0); ; shift += 7 {
