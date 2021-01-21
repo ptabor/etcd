@@ -22,13 +22,11 @@ import (
 	"sync"
 
 	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	"go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/naming"
+	"go.etcd.io/etcd/client/v3/naming/endpoints"
+	"golang.org/x/time/rate"
 
 	"go.uber.org/zap"
-	"golang.org/x/time/rate"
-	gnaming "google.golang.org/grpc/naming"
 )
 
 // allow maximum 1 retry per second
@@ -38,14 +36,13 @@ type clusterProxy struct {
 	lg   *zap.Logger
 	clus clientv3.Cluster
 	ctx  context.Context
-	gr   *naming.GRPCResolver
 
 	// advertise client URL
 	advaddr string
 	prefix  string
 
 	umu  sync.RWMutex
-	umap map[string]gnaming.Update
+	umap map[string]endpoints.Endpoint
 }
 
 // NewClusterProxy takes optional prefix to fetch grpc-proxy member endpoints.
@@ -55,22 +52,22 @@ func NewClusterProxy(lg *zap.Logger, c *clientv3.Client, advaddr string, prefix 
 	if lg == nil {
 		lg = zap.NewNop()
 	}
+
 	cp := &clusterProxy{
 		lg:   lg,
 		clus: c.Cluster,
 		ctx:  c.Ctx(),
-		gr:   &naming.GRPCResolver{Client: c},
 
 		advaddr: advaddr,
 		prefix:  prefix,
-		umap:    make(map[string]gnaming.Update),
+		umap:    make(map[string]endpoints.Endpoint),
 	}
 
 	donec := make(chan struct{})
 	if advaddr != "" && prefix != "" {
 		go func() {
 			defer close(donec)
-			cp.resolve(prefix)
+			cp.establishEndpointWatch(c, prefix)
 		}()
 		return cp, donec
 	}
@@ -79,38 +76,37 @@ func NewClusterProxy(lg *zap.Logger, c *clientv3.Client, advaddr string, prefix 
 	return cp, donec
 }
 
-func (cp *clusterProxy) resolve(prefix string) {
+func (cp *clusterProxy) establishEndpointWatch(c *clientv3.Client, prefix string) {
+	em := endpoints.NewManager(c, prefix)
 	rm := rate.NewLimiter(rate.Limit(resolveRetryRate), resolveRetryRate)
 	for rm.Wait(cp.ctx) == nil {
-		wa, err := cp.gr.Resolve(prefix)
+		wc, err := em.NewWatchChanel(cp.ctx)
 		if err != nil {
-			cp.lg.Warn("failed to resolve prefix", zap.String("prefix", prefix), zap.Error(err))
+			cp.lg.Warn("failed to establish endpoint watch", zap.String("prefix", prefix), zap.Error(err))
 			continue
 		}
-		cp.monitor(wa)
+		cp.monitor(wc)
 	}
 }
 
-func (cp *clusterProxy) monitor(wa gnaming.Watcher) {
-	for cp.ctx.Err() == nil {
-		ups, err := wa.Next()
-		if err != nil {
-			cp.lg.Warn("clusterProxy watcher error", zap.Error(err))
-			if rpctypes.ErrorDesc(err) == naming.ErrWatcherClosed.Error() {
-				return
+func (cp *clusterProxy) monitor(wa endpoints.WatchChannel) {
+	for {
+		select {
+		case <-cp.ctx.Done():
+			cp.lg.Info("watching endpoints interrupted", zap.Error(cp.ctx.Err()))
+			return
+		case updates := <-wa:
+			cp.umu.Lock()
+			for _, up := range updates {
+				switch up.Op {
+				case endpoints.Add:
+					cp.umap[up.Endpoint.Addr] = up.Endpoint
+				case endpoints.Delete:
+					delete(cp.umap, up.Endpoint.Addr)
+				}
 			}
+			cp.umu.Unlock()
 		}
-
-		cp.umu.Lock()
-		for i := range ups {
-			switch ups[i].Op {
-			case gnaming.Add:
-				cp.umap[ups[i].Addr] = *ups[i]
-			case gnaming.Delete:
-				delete(cp.umap, ups[i].Addr)
-			}
-		}
-		cp.umu.Unlock()
 	}
 }
 
