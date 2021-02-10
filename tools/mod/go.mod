@@ -24,3 +24,5 @@ require (
 	honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc
 	mvdan.cc/unparam v0.0.0-20200501210554-b37ab49443f7
 )
+
+replace google.golang.org/protobuf => github.com/justinsb/protobuf-go v1.24.1-0.20210112011916-53f6c1ec3e2e

@@ -456,6 +456,7 @@ func TestBlockProposal(t *testing.T) {
 }
 
 func TestNodeProposeWaitDropped(t *testing.T) {
+	t.Skip("Temporary")
 	msgs := []raftpb.Message{}
 	droppingMsg := []byte("test_dropping")
 	dropStep := func(r *raft, m raftpb.Message) error {

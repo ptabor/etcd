@@ -40,7 +40,7 @@ func TestEtcdGrpcResolver(t *testing.T) {
 	if err := s1.Start(nil); err != nil {
 		t.Fatal("failed to start dummy grpc server (s1)", err)
 	}
-	defer s1.Stop()TestNodeProposeWaitDropped
+	defer s1.Stop()
 
 	s2PayloadBody := []byte{'2'}
 	s2 := grpctest.NewDummy(s2PayloadBody)

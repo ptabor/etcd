@@ -38,3 +38,5 @@ require (
 	google.golang.org/grpc v1.35.0
 	gopkg.in/yaml.v2 v2.3.0
 )
+
+replace google.golang.org/protobuf => github.com/justinsb/protobuf-go v1.24.1-0.20210112011916-53f6c1ec3e2e

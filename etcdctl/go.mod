@@ -39,3 +39,5 @@ replace (
 	go.etcd.io/etcd/v3 => ./FORBIDDEN_DEPENDENCY
 	go.etcd.io/tests/v3 => ./FORBIDDEN_DEPENDENCY
 )
+
+replace google.golang.org/protobuf => github.com/justinsb/protobuf-go v1.24.1-0.20210112011916-53f6c1ec3e2e
