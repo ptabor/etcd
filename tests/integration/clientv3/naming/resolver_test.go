@@ -36,14 +36,14 @@ func TestEtcdGrpcResolver(t *testing.T) {
 	defer testutil.AfterTest(t)
 
 	s1PayloadBody := []byte{'1'}
-	s1 := newDummyStubServer(s1PayloadBody)
+	s1 := grpctest.NewDummy(s1PayloadBody)
 	if err := s1.Start(nil); err != nil {
 		t.Fatal("failed to start dummy grpc server (s1)", err)
 	}
 	defer s1.Stop()
 
 	s2PayloadBody := []byte{'2'}
-	s2 := newDummyStubServer(s2PayloadBody)
+	s2 := grpctest.NewDummy(s2PayloadBody)
 	if err := s2.Start(nil); err != nil {
 		t.Fatal("failed to start dummy grpc server (s2)", err)
 	}
@@ -112,18 +112,4 @@ func TestEtcdGrpcResolver(t *testing.T) {
 		}
 		break
 	}
-}
-
-func newDummyStubServer(body []byte) *grpctest.StubServer {
-	testService := &testpb.TestServiceService{
-		UnaryCall: func(ctx context.Context, in *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {
-			return &testpb.SimpleResponse{
-				Payload: &testpb.Payload{
-					Type: testpb.PayloadType_COMPRESSABLE,
-					Body: body,
-				},
-			}, nil
-		},
-	}
-	return grpctest.New(testService)
 }

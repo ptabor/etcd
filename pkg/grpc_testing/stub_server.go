@@ -1,6 +1,7 @@
 package grpc_testing
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -16,7 +17,7 @@ import (
 // StubServer is a server that is easy to customize within individual test
 // cases.
 type StubServer struct {
-	testService *testpb.TestServiceService
+	testService testpb.TestServiceServer
 
 	// Network and Address are parameters for Listen. Defaults will be used if these are empty before Start.
 	Network string
@@ -27,8 +28,28 @@ type StubServer struct {
 	cleanups []func() // Lambdas executed in Stop(); populated by Start().
 }
 
-func New(testService *testpb.TestServiceService) *StubServer {
-  return &StubServer{testService: testService}
+func New(testService testpb.TestServiceServer) *StubServer {
+	return &StubServer{testService: testService}
+}
+
+type dummyTestService struct {
+	testpb.UnimplementedTestServiceServer
+
+	body []byte
+}
+
+func (d dummyTestService) UnaryCall(context.Context, *testpb.SimpleRequest) (*testpb.SimpleResponse, error) {
+	return &testpb.SimpleResponse{
+		Payload: &testpb.Payload{
+			Type: testpb.PayloadType_COMPRESSABLE,
+			Body: d.body,
+		},
+	}, nil
+}
+
+func NewDummy(body []byte) *StubServer {
+	testService := dummyTestService{body: body}
+	return &StubServer{testService: &testService}
 }
 
 // Start starts the server and creates a client connected to it.
@@ -48,7 +69,7 @@ func (ss *StubServer) Start(sopts []grpc.ServerOption, dopts ...grpc.DialOption)
 	ss.cleanups = append(ss.cleanups, func() { lis.Close() })
 
 	s := grpc.NewServer(sopts...)
-	testpb.RegisterTestServiceService(s, ss.testService)
+	testpb.RegisterTestServiceServer(s, ss.testService)
 	go s.Serve(lis)
 	ss.cleanups = append(ss.cleanups, s.Stop)
 	ss.s = s
