@@ -459,6 +459,7 @@ func TestNodeProposeWaitDropped(t *testing.T) {
 	msgs := []raftpb.Message{}
 	droppingMsg := []byte("test_dropping")
 	dropStep := func(r *raft, m raftpb.Message) error {
+		t.Logf("m.String='%v'", m.String())
 		if m.Type == raftpb.MsgProp && strings.Contains(m.String(), string(droppingMsg)) {
 			t.Logf("dropping message: %v", m.String())
 			return ErrProposalDropped
@@ -495,7 +496,7 @@ func TestNodeProposeWaitDropped(t *testing.T) {
 
 	n.Stop()
 	if len(msgs) != 0 {
-		t.Fatalf("len(msgs) = %d, want %d", len(msgs), 1)
+		t.Fatalf("len(msgs) = %d, want %d", len(msgs), 0)
 	}
 }
 

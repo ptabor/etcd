@@ -17,3 +17,5 @@ replace go.etcd.io/etcd => ./FORBIDDEN_DEPENDENCY
 replace go.etcd.io/etcd/v3 => ./FORBIDDEN_DEPENDENCY
 
 replace go.etcd.io/etcd/pkg/v3 => ../pkg
+
+replace google.golang.org/protobuf => github.com/justinsb/protobuf-go v1.24.1-0.20210112011916-53f6c1ec3e2e
