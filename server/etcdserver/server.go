@@ -33,6 +33,7 @@ import (
 	"github.com/coreos/go-semver/semver"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 	"go.uber.org/zap"
 
 	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
@@ -59,7 +60,6 @@ import (
 	"go.etcd.io/etcd/server/v3/etcdserver/api/v2store"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/v3alarm"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/v3compactor"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/lease"
 	"go.etcd.io/etcd/server/v3/lease/leasehttp"
 	"go.etcd.io/etcd/server/v3/mvcc"
@@ -206,8 +206,8 @@ type EtcdServer struct {
 	term              uint64 // must use atomic operations to access; keep 64-bit aligned.
 	lead              uint64 // must use atomic operations to access; keep 64-bit aligned.
 
-	consistIndex cindex.ConsistentIndexer // consistIndex is used to get/set/save consistentIndex
-	r            raftNode                 // uses 64-bit atomics; keep 64-bit aligned.
+	metadataCache metacache.RaftMetadataCache // metadataCache is used to get/set/save consistentIndex
+	r             raftNode                    // uses 64-bit atomics; keep 64-bit aligned.
 
 	readych chan struct{}
 	Cfg     ServerConfig
@@ -518,7 +518,7 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 		reqIDGen:         idutil.NewGenerator(uint16(id), time.Now()),
 		forceVersionC:    make(chan struct{}),
 		AccessController: &AccessController{CORS: cfg.CORS, HostWhitelist: cfg.HostWhitelist},
-		consistIndex:     cindex.NewConsistentIndex(be.BatchTx()),
+		metadataCache:    metacache.NewConsistentIndex(be.BatchTx()),
 	}
 	serverID.With(prometheus.Labels{"server_id": id.String()}).Set(1)
 
@@ -537,7 +537,7 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 			CheckpointInterval:         cfg.LeaseCheckpointInterval,
 			ExpiredLeasesRetryInterval: srv.Cfg.ReqTimeout(),
 		},
-		srv.consistIndex,
+		srv.metadataCache,
 	)
 
 	tp, err := auth.NewTokenProvider(cfg.Logger, cfg.AuthToken,
@@ -550,8 +550,8 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 		cfg.Logger.Warn("failed to create token provider", zap.Error(err))
 		return nil, err
 	}
-	srv.kv = mvcc.New(srv.getLogger(), srv.be, srv.lessor, srv.consistIndex, mvcc.StoreConfig{CompactionBatchLimit: cfg.CompactionBatchLimit})
-	kvindex := srv.consistIndex.ConsistentIndex()
+	srv.kv = mvcc.New(srv.getLogger(), srv.be, srv.lessor, srv.metadataCache, mvcc.StoreConfig{CompactionBatchLimit: cfg.CompactionBatchLimit})
+	kvindex := srv.metadataCache.ConsistentIndex()
 	srv.lg.Debug("restore consistentIndex",
 		zap.Uint64("index", kvindex))
 	if beExist {
@@ -568,7 +568,7 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 		}
 	}
 
-	srv.authStore = auth.NewAuthStore(srv.getLogger(), srv.be, srv.consistIndex, tp, int(cfg.BcryptCost))
+	srv.authStore = auth.NewAuthStore(srv.getLogger(), srv.be, srv.metadataCache, tp, int(cfg.BcryptCost))
 
 	newSrv := srv // since srv == nil in defer if srv is returned as nil
 	defer func() {
@@ -1172,7 +1172,7 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 		lg.Panic("failed to restore mvcc store", zap.Error(err))
 	}
 
-	s.consistIndex.SetConsistentIndex(s.kv.ConsistentIndex())
+	s.metadataCache.SetConsistentIndex(s.kv.ConsistentIndex())
 	lg.Info("restored mvcc store")
 
 	// Closing old backend might block until all the txns
@@ -2018,8 +2018,8 @@ func (s *EtcdServer) apply(
 
 		case raftpb.EntryConfChange:
 			// set the consistent index of current executing entry
-			if e.Index > s.consistIndex.ConsistentIndex() {
-				s.consistIndex.SetConsistentIndex(e.Index)
+			if e.Index > s.metadataCache.ConsistentIndex() {
+				s.metadataCache.SetConsistentIndex(e.Index)
 			}
 			var cc raftpb.ConfChange
 			pbutil.MustUnmarshal(&cc, e.Data)
@@ -2044,10 +2044,10 @@ func (s *EtcdServer) apply(
 // applyEntryNormal apples an EntryNormal type raftpb request to the EtcdServer
 func (s *EtcdServer) applyEntryNormal(e *raftpb.Entry) {
 	shouldApplyV3 := false
-	index := s.consistIndex.ConsistentIndex()
+	index := s.metadataCache.ConsistentIndex()
 	if e.Index > index {
 		// set the consistent index of current executing entry
-		s.consistIndex.SetConsistentIndex(e.Index)
+		s.metadataCache.SetConsistentIndex(e.Index)
 		shouldApplyV3 = true
 	}
 	s.lg.Debug("apply entry normal",

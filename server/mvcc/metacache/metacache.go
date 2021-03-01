@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cindex
+package metacache
 
 import (
 	"encoding/binary"
@@ -28,8 +28,11 @@ var (
 	consistentIndexKeyName = []byte("consistent_index")
 )
 
-// ConsistentIndexer is an interface that wraps the Get/Set/Save method for consistentIndex.
-type ConsistentIndexer interface {
+// RaftMetadataCache is an interface that wraps the Get/Set/Save method for:
+//  - raftMetadataCache (last applied index)
+//  - term
+//  - cluster conf state
+type RaftMetadataCache interface {
 
 	// ConsistentIndex returns the consistent index of current executing entry.
 	ConsistentIndex() uint64
@@ -38,15 +41,15 @@ type ConsistentIndexer interface {
 	SetConsistentIndex(v uint64)
 
 	// UnsafeSave must be called holding the lock on the tx.
-	// It saves consistentIndex to the underlying stable storage.
+	// It saves raftMetadataCache to the underlying stable storage.
 	UnsafeSave(tx backend.BatchTx)
 
-	// SetBatchTx set the available backend.BatchTx for ConsistentIndexer.
+	// SetBatchTx set the available backend.BatchTx for RaftMetadataCache.
 	SetBatchTx(tx backend.BatchTx)
 }
 
-// consistentIndex implements the ConsistentIndexer interface.
-type consistentIndex struct {
+// raftMetadataCache implements the RaftMetadataCache interface.
+type raftMetadataCache struct {
 	tx backend.BatchTx
 	// consistentIndex represents the offset of an entry in a consistent replica log.
 	// it caches the "consistent_index" key's value. Accessed
@@ -58,11 +61,11 @@ type consistentIndex struct {
 	mutex     sync.Mutex
 }
 
-func NewConsistentIndex(tx backend.BatchTx) ConsistentIndexer {
-	return &consistentIndex{tx: tx, bytesBuf8: make([]byte, 8)}
+func NewConsistentIndex(tx backend.BatchTx) RaftMetadataCache {
+	return &raftMetadataCache{tx: tx, bytesBuf8: make([]byte, 8)}
 }
 
-func (ci *consistentIndex) ConsistentIndex() uint64 {
+func (ci *raftMetadataCache) ConsistentIndex() uint64 {
 
 	if index := atomic.LoadUint64(&ci.consistentIndex); index > 0 {
 		return index
@@ -80,11 +83,11 @@ func (ci *consistentIndex) ConsistentIndex() uint64 {
 	return v
 }
 
-func (ci *consistentIndex) SetConsistentIndex(v uint64) {
+func (ci *raftMetadataCache) SetConsistentIndex(v uint64) {
 	atomic.StoreUint64(&ci.consistentIndex, v)
 }
 
-func (ci *consistentIndex) UnsafeSave(tx backend.BatchTx) {
+func (ci *raftMetadataCache) UnsafeSave(tx backend.BatchTx) {
 	bs := ci.bytesBuf8
 	binary.BigEndian.PutUint64(bs, ci.consistentIndex)
 	// put the index into the underlying backend
@@ -92,23 +95,8 @@ func (ci *consistentIndex) UnsafeSave(tx backend.BatchTx) {
 	tx.UnsafePut(metaBucketName, consistentIndexKeyName, bs)
 }
 
-func (ci *consistentIndex) SetBatchTx(tx backend.BatchTx) {
+func (ci *raftMetadataCache) SetBatchTx(tx backend.BatchTx) {
 	ci.mutex.Lock()
 	defer ci.mutex.Unlock()
 	ci.tx = tx
 }
-
-func NewFakeConsistentIndex(index uint64) ConsistentIndexer {
-	return &fakeConsistentIndex{index: index}
-}
-
-type fakeConsistentIndex struct{ index uint64 }
-
-func (f *fakeConsistentIndex) ConsistentIndex() uint64 { return f.index }
-
-func (f *fakeConsistentIndex) SetConsistentIndex(index uint64) {
-	atomic.StoreUint64(&f.index, index)
-}
-
-func (f *fakeConsistentIndex) UnsafeSave(tx backend.BatchTx) {}
-func (f *fakeConsistentIndex) SetBatchTx(tx backend.BatchTx) {}

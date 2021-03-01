@@ -26,9 +26,9 @@ import (
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	"go.etcd.io/etcd/pkg/v3/testutil"
 	"go.etcd.io/etcd/pkg/v3/traceutil"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/mvcc"
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 
 	"go.uber.org/zap"
 )
@@ -167,7 +167,7 @@ func TestV3CorruptAlarm(t *testing.T) {
 	clus.Members[0].Stop(t)
 	fp := filepath.Join(clus.Members[0].DataDir, "member", "snap", "db")
 	be := backend.NewDefaultBackend(fp)
-	s := mvcc.NewStore(zap.NewExample(), be, nil, cindex.NewFakeConsistentIndex(13), mvcc.StoreConfig{})
+	s := mvcc.NewStore(zap.NewExample(), be, nil, metacache.NewFakeConsistentIndex(13), mvcc.StoreConfig{})
 	// NOTE: cluster_proxy mode with namespacing won't set 'k', but namespace/'k'.
 	s.Put([]byte("abc"), []byte("def"), 0)
 	s.Put([]byte("xyz"), []byte("123"), 0)

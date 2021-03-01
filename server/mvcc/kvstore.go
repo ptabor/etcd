@@ -26,9 +26,9 @@ import (
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	"go.etcd.io/etcd/pkg/v3/schedule"
 	"go.etcd.io/etcd/pkg/v3/traceutil"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/lease"
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 
 	"go.uber.org/zap"
 )
@@ -71,7 +71,7 @@ type store struct {
 	// mu read locks for txns and write locks for non-txn store changes.
 	mu sync.RWMutex
 
-	ci cindex.ConsistentIndexer
+	metadataCache metacache.RaftMetadataCache
 
 	b       backend.Backend
 	kvindex index
@@ -96,7 +96,7 @@ type store struct {
 
 // NewStore returns a new store. It is useful to create a store inside
 // mvcc pkg. It should only be used for testing externally.
-func NewStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ci cindex.ConsistentIndexer, cfg StoreConfig) *store {
+func NewStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, metadataCache metacache.RaftMetadataCache, cfg StoreConfig) *store {
 	if lg == nil {
 		lg = zap.NewNop()
 	}
@@ -104,10 +104,10 @@ func NewStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ci cindex.Cons
 		cfg.CompactionBatchLimit = defaultCompactBatchLimit
 	}
 	s := &store{
-		cfg:     cfg,
-		b:       b,
-		ci:      ci,
-		kvindex: newTreeIndex(lg),
+		cfg:           cfg,
+		b:             b,
+		metadataCache: metadataCache,
+		kvindex:       newTreeIndex(lg),
 
 		le: le,
 
@@ -344,8 +344,8 @@ func (s *store) Restore(b backend.Backend) error {
 
 	s.fifoSched = schedule.NewFIFOScheduler()
 	s.stopc = make(chan struct{})
-	s.ci.SetBatchTx(b.BatchTx())
-	s.ci.SetConsistentIndex(0)
+	s.metadataCache.SetBatchTx(b.BatchTx())
+	s.metadataCache.SetConsistentIndex(0)
 
 	return s.restore()
 }
@@ -532,14 +532,14 @@ func (s *store) Close() error {
 }
 
 func (s *store) saveIndex(tx backend.BatchTx) {
-	if s.ci != nil {
-		s.ci.UnsafeSave(tx)
+	if s.metadataCache != nil {
+		s.metadataCache.UnsafeSave(tx)
 	}
 }
 
 func (s *store) ConsistentIndex() uint64 {
-	if s.ci != nil {
-		return s.ci.ConsistentIndex()
+	if s.metadataCache != nil {
+		return s.metadataCache.ConsistentIndex()
 	}
 	return 0
 }

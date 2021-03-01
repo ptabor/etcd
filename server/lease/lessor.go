@@ -25,9 +25,9 @@ import (
 	"time"
 
 	pb "go.etcd.io/etcd/api/v3/etcdserverpb"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/lease/leasepb"
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 	"go.uber.org/zap"
 )
 
@@ -182,7 +182,7 @@ type lessor struct {
 	checkpointInterval time.Duration
 	// the interval to check if the expired lease is revoked
 	expiredLeaseRetryInterval time.Duration
-	ci                        cindex.ConsistentIndexer
+	metadataCache             metacache.RaftMetadataCache
 }
 
 type LessorConfig struct {
@@ -191,11 +191,11 @@ type LessorConfig struct {
 	ExpiredLeasesRetryInterval time.Duration
 }
 
-func NewLessor(lg *zap.Logger, b backend.Backend, cfg LessorConfig, ci cindex.ConsistentIndexer) Lessor {
-	return newLessor(lg, b, cfg, ci)
+func NewLessor(lg *zap.Logger, b backend.Backend, cfg LessorConfig, metadataCache metacache.RaftMetadataCache) Lessor {
+	return newLessor(lg, b, cfg, metadataCache)
 }
 
-func newLessor(lg *zap.Logger, b backend.Backend, cfg LessorConfig, ci cindex.ConsistentIndexer) *lessor {
+func newLessor(lg *zap.Logger, b backend.Backend, cfg LessorConfig, metadataCache metacache.RaftMetadataCache) *lessor {
 	checkpointInterval := cfg.CheckpointInterval
 	expiredLeaseRetryInterval := cfg.ExpiredLeasesRetryInterval
 	if checkpointInterval == 0 {
@@ -214,11 +214,11 @@ func newLessor(lg *zap.Logger, b backend.Backend, cfg LessorConfig, ci cindex.Co
 		checkpointInterval:        checkpointInterval,
 		expiredLeaseRetryInterval: expiredLeaseRetryInterval,
 		// expiredC is a small buffered chan to avoid unnecessary blocking.
-		expiredC: make(chan []*Lease, 16),
-		stopC:    make(chan struct{}),
-		doneC:    make(chan struct{}),
-		lg:       lg,
-		ci:       ci,
+		expiredC:      make(chan []*Lease, 16),
+		stopC:         make(chan struct{}),
+		doneC:         make(chan struct{}),
+		lg:            lg,
+		metadataCache: metadataCache,
 	}
 	l.initAndRecover()
 
@@ -294,7 +294,7 @@ func (le *lessor) Grant(id LeaseID, ttl int64) (*Lease, error) {
 	}
 
 	le.leaseMap[id] = l
-	l.persistTo(le.b, le.ci)
+	l.persistTo(le.b, le.metadataCache)
 
 	leaseTotalTTLs.Observe(float64(l.ttl))
 	leaseGranted.Inc()
@@ -341,9 +341,9 @@ func (le *lessor) Revoke(id LeaseID) error {
 	// kv deletion. Or we might end up with not executing the revoke or not
 	// deleting the keys if etcdserver fails in between.
 	le.b.BatchTx().UnsafeDelete(leaseBucketName, int64ToBytes(int64(l.ID)))
-	// if len(keys) > 0, txn.End() will call ci.UnsafeSave function.
-	if le.ci != nil && len(keys) == 0 {
-		le.ci.UnsafeSave(le.b.BatchTx())
+	// if len(keys) > 0, txn.End() will call metadataCache.UnsafeSave function.
+	if le.metadataCache != nil && len(keys) == 0 {
+		le.metadataCache.UnsafeSave(le.b.BatchTx())
 	}
 
 	txn.End()
@@ -828,7 +828,7 @@ func (l *Lease) expired() bool {
 	return l.Remaining() <= 0
 }
 
-func (l *Lease) persistTo(b backend.Backend, ci cindex.ConsistentIndexer) {
+func (l *Lease) persistTo(b backend.Backend, metadataCache metacache.RaftMetadataCache) {
 	key := int64ToBytes(int64(l.ID))
 
 	lpb := leasepb.Lease{ID: int64(l.ID), TTL: l.ttl, RemainingTTL: l.remainingTTL}
@@ -839,8 +839,8 @@ func (l *Lease) persistTo(b backend.Backend, ci cindex.ConsistentIndexer) {
 
 	b.BatchTx().Lock()
 	b.BatchTx().UnsafePut(leaseBucketName, key, val)
-	if ci != nil {
-		ci.UnsafeSave(b.BatchTx())
+	if metadataCache != nil {
+		metadataCache.UnsafeSave(b.BatchTx())
 	}
 	b.BatchTx().Unlock()
 }

@@ -12,5 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package cindex provides an interface and implementation for getting/saving consistentIndex.
-package cindex
+// Package metacache provides an interface and implementation for
+// getting/saving raft related metadata in the mvcc storage like:
+// consistent index, term & conf_state.
+//
+// The goal of this package is to provide abstractions for access to these
+// properties and allow of 'batching' edits during application of many 'entries'.
+package metacache

@@ -40,10 +40,10 @@ import (
 	"go.etcd.io/etcd/server/v3/etcdserver/api/membership"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/snap"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/v2store"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/lease"
 	"go.etcd.io/etcd/server/v3/mvcc"
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 	"go.etcd.io/etcd/server/v3/wal"
 	"go.etcd.io/etcd/server/v3/wal/walpb"
 	"go.uber.org/zap"
@@ -355,7 +355,7 @@ func (s *v3Manager) saveDB() error {
 	// having a new raft instance
 	be := backend.NewDefaultBackend(dbpath)
 
-	ci := cindex.NewConsistentIndex(be.BatchTx())
+	ci := metacache.NewConsistentIndex(be.BatchTx())
 	ci.SetConsistentIndex(uint64(commit))
 
 	// a lessor never timeouts leases

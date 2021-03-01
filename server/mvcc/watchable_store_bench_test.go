@@ -20,9 +20,9 @@ import (
 	"testing"
 
 	"go.etcd.io/etcd/pkg/v3/traceutil"
-	"go.etcd.io/etcd/server/v3/etcdserver/cindex"
 	"go.etcd.io/etcd/server/v3/lease"
 	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/mvcc/metacache"
 
 	"go.uber.org/zap"
 )
@@ -49,7 +49,7 @@ func BenchmarkWatchableStorePut(b *testing.B) {
 // some synchronization operations, such as mutex locking.
 func BenchmarkWatchableStoreTxnPut(b *testing.B) {
 	be, tmpPath := backend.NewDefaultTmpBackend()
-	s := New(zap.NewExample(), be, &lease.FakeLessor{}, cindex.NewConsistentIndex(be.BatchTx()), StoreConfig{})
+	s := New(zap.NewExample(), be, &lease.FakeLessor{}, metacache.NewConsistentIndex(be.BatchTx()), StoreConfig{})
 	defer cleanup(s, be, tmpPath)
 
 	// arbitrary number of bytes
